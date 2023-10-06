@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="de">
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Hoffest Funkzentrale</title>
+      <link rel="shortcut icon" href="/static/hoffest-logo.png" type="image/x-icon">
+      <link rel="icon" href="/static/hoffest-logo.png" type="image/x-icon">
+      <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+      <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+      <script>
+         if ('serviceWorker' in navigator) {
+             navigator.serviceWorker.register('/service-worker.js')
+                 .then(function(registration) {
+                     console.log('Service Worker registered with scope:', registration.scope);
+                 })
+                 .catch(function(error) {
+                     console.error('Service Worker registration failed:', error);
+                 });
+         }
+      </script>
+   </head>
+   <body>
+      <header style="display: flex; align-items: center;">
+         <img style="margin-left: 20px;" src="/static/hoffest-logo.png" alt="DMR-Funkzentrale Logo" width="56" height="56">
+         <h1 style="margin-left: 20px">Hoffest Funkzentrale</h1>
+         <button id="toggleDarkMode" class="dark-mode-toggle">L/D</button>
+      </header>
+      <main>
+         <form action="/play" method="POST" id="playForm">
+            <label for="audio">Audiodatei abspielen</label>
+            <select name="audio" id="audio">
+               {% for file in audio_files %}
+               <option value="{{ file }}">{{ file.split('.')[0] }}</option>
+               {% endfor %}
+            </select>
+            <button type="submit">Abspielen</button>
+         </form>
+         <hr>
+         <br>
+         <h2>Vorhandene Audiodatein</h2>
+         <ul>
+            {% for file in audio_files %}
+            <li>
+               {{ file.split('.')[0] }}
+               <br>
+               <audio controls>
+                  <source src="{{ url_for('serve_audio', filename=file) }}" type="audio/mpeg">
+                  Dein Browser unterstützt das Audio-Element nicht.
+               </audio>
+               <br>
+               <a href="#" class="preview-link" data-filename="{{ file }}" onclick="previewAudio('{{ file }}')">Abspielen</a>
+               <a href="#" class="rename-link" data-filename="{{ file }}">Umbenennen</a>
+               <a href="#" class="delete-link" data-filename="{{ file }}">Löschen</a>
+            </li>
+            <br>
+            {% endfor %}
+            <br>
+         </ul>
+         <hr>
+         <br>
+         <form action="/upload" method="POST" enctype="multipart/form-data" onsubmit="return validateFile()">
+            <h2>Audiodatei hochladen</h2>
+            <h4>(Unterst&uuml;tze Formate: *.mp3, *.wav, *.m4a, *.aac)</h4>
+            <input type="file" name="file" id="fileInput">
+            <button type="submit">Hochladen</button>
+         </form>
+         <div id="fileUploadAlert" style="display: none;color:Tomato;">Nur die folgenden Dateiformate werden unterstützt: .mp3, *.wav, *.m4a, *.aac</div>
+      </main>
+      <footer>
+         <p>Hoffest Funkzentrale by <a href="https://prjx.de">https://prjx.de</p>
+      </footer>
+      <script>
+         const deleteLinks = document.querySelectorAll('.delete-link');
+         const renameLinks = document.querySelectorAll('.rename-link');
+         const previewLinks = document.querySelectorAll('.preview-link');
+         const audioFiles = document.querySelectorAll('.audio-file');
+         
+         deleteLinks.forEach(link => {
+             link.addEventListener('click', function (e) {
+                 e.preventDefault();
+                 const filename = this.getAttribute('data-filename');
+                 const confirmDelete = confirm(`Möchtest du die Datei "${filename}" wirklich löschen?`);
+                 if (confirmDelete) {
+                     window.location.href = `/delete/${filename}`;
+                 }
+             });
+         });
+         
+         renameLinks.forEach(link => {
+             link.addEventListener('click', function (e) {
+                 e.preventDefault();
+                 const filename = this.getAttribute('data-filename');
+                 const newName = prompt('Neuen Dateinamen eingeben:', filename.split('.')[0]);
+                 if (newName) {
+                     const newFilename = newName + '.' + filename.split('.')[1];
+                     window.location.href = `/rename/${filename}/${newFilename}`;
+                 }
+             });
+         });
+         
+         const toggleDarkModeButton = document.getElementById('toggleDarkMode');
+         const body = document.body;
+         
+         function setDarkMode(isDarkMode) {
+             body.classList.toggle('dark-mode', isDarkMode);
+             localStorage.setItem('darkMode', isDarkMode);
+         }
+         
+         function loadDarkMode() {
+             const isDarkMode = localStorage.getItem('darkMode') === 'true';
+             setDarkMode(isDarkMode);
+         }
+         
+         loadDarkMode();
+         toggleDarkModeButton.addEventListener('click', () => {
+             const isDarkMode = body.classList.contains('dark-mode');
+             setDarkMode(!isDarkMode);
+         });
+         
+         function validateFile() {
+             const fileInput = document.getElementById('fileInput');
+             const allowedExtensions = ["mp3", "wav", "m4a", "aac"];
+             const fileName = fileInput.value.toLowerCase();
+             const fileExtension = fileName.split('.').pop();
+             
+             if (!allowedExtensions.includes(fileExtension)) {
+                 const fileUploadAlert = document.getElementById('fileUploadAlert');
+                 fileUploadAlert.style.display = 'block';
+                 setTimeout(() => {
+                     fileUploadAlert.style.display = 'none';
+                 }, 5000);
+                 return false;
+             }
+             
+             return true;
+         }
+         
+         function previewAudio(filename) {
+             const audioDropdown = document.getElementById('audio');
+             audioDropdown.value = filename;
+             document.getElementById('playForm').submit();
+         }
+      </script>
+   </body>
+</html>
+

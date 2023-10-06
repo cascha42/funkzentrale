@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Browser</title>
+</head>
+<body>
+    <h1>File Browser: audio_files</h1>
+    <ul>
+        {% for file in audio_files %}
+            <li><a href="{{ url_for('serve_audio', filename=file) }}">{{ file }}</a></li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+

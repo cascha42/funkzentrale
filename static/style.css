@@ -1,0 +1,249 @@
+/* Danke an ChatGPT fuer Designen der CSS, da ich da keinen Bock drauf hatte haha
+
+                  ,--.    ,--.
+                 ((O ))--((O ))
+               ,'_`--'____`--'_`.
+              _:  ____________  :_
+             | | ||::::::::::|| | |
+             | | ||::::::::::|| | |
+             | | ||::::::::::|| | |
+             |_| |/__________\| |_|
+               |________________|
+            __..-'            `-..__
+         .-| : .----------------. : |-.
+       ,\ || | |\______________/| | || /.
+      /`.\:| | ||  __  __  __  || | |;/,'\
+     :`-._\;.| || '--''--''--' || |,:/_.-':
+     |    :  | || .----------. || |  :    |
+     |    |  | || '----SSt---' || |  |    |
+     |    |  | ||   _   _   _  || |  |    |
+     :,--.;  | ||  (_) (_) (_) || |  :,--.;
+     (`-'|)  | ||______________|| |  (|`-')
+      `--'   | |/______________\| |   `--'
+             |____________________|
+              `.________________,'
+               (_______)(_______)
+               (_______)(_______)
+               (_______)(_______)
+               (_______)(_______)
+              |        ||        |
+              '--------''--------' 
+*/
+
+/* Reset CSS */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body Styling für Dark Mode */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #1f1f1f;
+    margin: 0;
+    padding: 0;
+    transition: background-color 0.3s ease;
+    color: #333; /* Standardtextfarbe */
+}
+
+/* Header Styling für Dark Mode */
+header {
+    background-color: #00092e;
+    color: #fff;
+    text-align: center;
+    padding: 20px 0;
+    position: relative;
+}
+
+header h1 {
+    font-size: 38px;
+}
+
+/* Hauptbereich Styling für Dark Mode */
+main {
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    color: #333; /* Standardtextfarbe */
+}
+
+/* Form Styling für Dark Mode */
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333; /* Textfarbe für Labels */
+    font-size: 25px; /* Größe des Texts ändern */
+}
+
+select,
+button {
+    padding: 12px;
+    margin-bottom: 20px;
+    background-color: #333; /* Hintergrundfarbe für Select und Button */
+    color: #fff; /* Textfarbe für Select und Button */
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+select:hover,
+button:hover {
+    background-color: #555; /* Farbe bei Hover */
+}
+
+/* Footer Styling */
+footer {
+    text-align: center;
+    background-color: #333;
+    color: #fff;
+    padding: 10px 0;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 23px;
+    }
+
+    main {
+        padding: 15px;
+    }
+
+    select,
+    button {
+        padding: 10px;
+        margin-bottom: 15px;
+    }
+
+    /* Padding für die Liste anpassen */
+    ul {
+        padding-left: 20px; /* Hier kannst du die gewünschte Einrückung festlegen */
+    }
+}
+
+/* Löschen-Button Styling */
+.delete-link {
+    color: #f44336;
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    margin-left: 10px; /* Abstand zwischen Dateinamen und Löschen-Button */
+}
+
+.delete-link:hover {
+    color: #d32f2f;
+}
+
+/* Umbenennen-Button Styling */
+.rename-link {
+    color: #2196F3; /* Schönes Blau */
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    margin-left: 10px; /* Abstand zwischen Dateinamen und Umbenennen-Button */
+}
+
+.rename-link:hover {
+    color: #0D47A1; /* Dunkleres Blau */
+}
+
+/* Vorschau-Button Styling */
+.preview-link {
+    color: #4CAF50; /* Grün */
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    margin-left: 10px; /* Abstand zwischen Dateinamen und Vorschau-Button */
+}
+
+.preview-link:hover {
+    color: #45A049; /* Dunkleres Grün bei Hover */
+}
+
+/* Dark Mode-Stile */
+.dark-mode body {
+    background-color: #121212;
+    color: #ffffff; /* Weiße Textfarbe im Dark Mode */
+    border-radius: 0; /* Keine abgerundeten Ecken im Dark Mode */
+}
+
+.dark-mode header {
+    background-color: #00092e;
+    color: #ffffff; /* Weiße Textfarbe im Dark Mode */
+    border-radius: 0; /* Keine abgerundeten Ecken im Dark Mode */
+}
+
+.dark-mode main {
+    background-color: #1f1f1f;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+    color: #ffffff; /* Weiße Textfarbe im Dark Mode */
+    border-radius: 0; /* Keine abgerundeten Ecken im Dark Mode */
+}
+
+.dark-mode label {
+    color: #ffffff; /* Weiße Textfarbe im Dark Mode */
+}
+
+.dark-mode select,
+.dark-mode button {
+    background-color: #333333;
+    color: #ffffff; /* Weiße Textfarbe im Dark Mode */
+}
+
+.dark-mode select:hover,
+.dark-mode button:hover {
+    background-color: #222;
+}
+
+.dark-mode footer {
+    background-color: #333333;
+    color: #ffffff; /* Weiße Textfarbe im Dark Mode */
+}
+
+.dark-mode .delete-link {
+    color: #ff5b5b;
+}
+
+.dark-mode .delete-link:hover {
+    color: #ff0000;
+}
+
+.dark-mode .rename-link {
+    color: #2196F3; /* Schönes Blau im Dark Mode */
+}
+
+.dark-mode .rename-link:hover {
+    color: #0D47A1; /* Dunkleres Blau im Dark Mode */
+}
+
+.dark-mode .preview-link {
+    color: #4CAF50; /* Grün im Dark Mode */
+}
+
+.dark-mode .preview-link:hover {
+    color: #45A049; /* Dunkleres Grün im Dark Mode */
+}
+
+/* Dark Mode-Schalter-Styling */
+.dark-mode-toggle {
+    position: absolute;
+    right: 20px; /* Abstand vom rechten Rand des Headers anpassen */
+    background: transparent;
+    border: 2px solid #fff; /* Umrandung hinzufügen */
+    border-radius: 5px; /* Eckige Form mit abgerundeten Ecken */
+    padding: 5px;
+    cursor: pointer;
+    background-color: #333; /* Hintergrundfarbe */
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+.dark-mode-toggle:hover {
+    background-color: #555; /* Hintergrundfarbe bei Hover */
+    border-color: #555; /* Umrandungsfarbe bei Hover */
+}
+

@@ -3,6 +3,7 @@ import os
 import subprocess
 import RPi.GPIO as GPIO
 import time
+from gtts import gTTS
 
 app = Flask(__name__)
 
@@ -33,7 +34,28 @@ def play_audio():
     subprocess.run(['mplayer', '-ao', 'alsa', os.path.join(audio_folder, selected_audio)])
     
     GPIO.output(gpio_pin, GPIO.LOW)
+
+    os.remove(os.path.join(audio_folder, selected_audio))
     
+    return redirect('/')
+
+
+@app.route('/tts', methods=['POST'])
+def play_tts():
+    tts_text = request.form['tts']
+
+    tts = gTTS(tts_text, lang='de')
+    tts.save(os.path.join(audio_folder, 'tts.mp3'))
+
+    GPIO.output(gpio_pin, GPIO.HIGH)
+
+    time.sleep(0.2)
+    subprocess.run(['mplayer', '-ao', 'alsa', os.path.join(audio_folder, 'tts.mp3')])
+
+    GPIO.output(gpio_pin, GPIO.LOW)
+
+
+
     return redirect('/')
 
 @app.route('/upload', methods=['POST'])

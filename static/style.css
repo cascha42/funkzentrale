@@ -81,6 +81,7 @@ label {
     font-size: 25px; /* Größe des Texts ändern */
 }
 
+input,
 select,
 button {
     padding: 12px;

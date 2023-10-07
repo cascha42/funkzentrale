@@ -38,6 +38,13 @@
          </form>
          <hr>
          <br>
+        <form action="/tts" method="POST" id="ttsForm">
+            <label for="tts">Text-to-Speech abspielen</label>
+            <input id="tts" name="tts"/>
+            <button type="submit">Abspielen</button>
+         </form>
+         <hr>
+         <br>
          <h2>Vorhandene Audiodatein</h2>
          <ul>
             {% for file in audio_files %}

@@ -35,8 +35,6 @@ def play_audio():
     
     GPIO.output(gpio_pin, GPIO.LOW)
 
-    os.remove(os.path.join(audio_folder, selected_audio))
-    
     return redirect('/')
 
 
@@ -52,9 +50,9 @@ def play_tts():
     time.sleep(0.2)
     subprocess.run(['mplayer', '-ao', 'alsa', os.path.join(audio_folder, 'tts.mp3')])
 
+    os.remove(os.path.join(audio_folder, 'tts.mp3'))
+
     GPIO.output(gpio_pin, GPIO.LOW)
-
-
 
     return redirect('/')
 

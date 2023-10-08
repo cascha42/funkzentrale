@@ -31,7 +31,7 @@ GPIO.output(gpio_pin, GPIO.LOW)
 @app.route('/')
 def index():
     audio_files = [f for f in os.listdir(audio_folder) if f.endswith(('.mp3', '.wav', 'm4a', 'aac'))]
-    return render_template('index.html', audio_files=audio_files, app_name=app_name, app_logo=app_logo)
+    return render_template('index.html.j2', audio_files=audio_files, app_name=app_name, app_logo=app_logo)
 
 @app.route('/play', methods=['POST'])
 def play_audio():
@@ -99,7 +99,7 @@ def serve_audio(filename):
 @app.route('/files')
 def file_browser():
     audio_files = [f for f in os.listdir(audio_folder)]
-    return render_template('file_browser.html', audio_files=audio_files)
+    return render_template('file_browser.html.j2', audio_files=audio_files)
 
 @app.route('/service-worker.js')
 def service_worker():

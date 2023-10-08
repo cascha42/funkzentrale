@@ -10,6 +10,12 @@ app = Flask(__name__)
 # Webserver Port (HTTP)
 http_port = 8080
 
+# App-Name
+app_name = "Hoffest Funkzentrale"
+
+# App-Logo in '/static' Sub-Folder
+app_logo = "hoffest-logo.png"
+
 # Push-to-Talk GPIO (BCM / Broadcom notation, https://pinout.xyz/)
 gpio_pin = 17
 
@@ -25,7 +31,7 @@ GPIO.output(gpio_pin, GPIO.LOW)
 @app.route('/')
 def index():
     audio_files = [f for f in os.listdir(audio_folder) if f.endswith(('.mp3', '.wav', 'm4a', 'aac'))]
-    return render_template('index.html', audio_files=audio_files)
+    return render_template('index.html', audio_files=audio_files, app_name=app_name, app_logo=app_logo)
 
 @app.route('/play', methods=['POST'])
 def play_audio():

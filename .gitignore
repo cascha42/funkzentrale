@@ -4,7 +4,6 @@
 .idea/
 
 audio_files/*
-!audio_files/.gitkeep
 !audio_files/Hallo_TTS.mp3
 
 ### Flask ###

@@ -34,13 +34,17 @@
                <option value="{{ file }}">{{ file.split('.')[0] }}</option>
                {% endfor %}
             </select>
+	    {% if audio_files %}
             <button type="submit">Abspielen</button>
+	    {% else %}
+            <div style="color: Tomato;">Keine Audiodateien vorhanden!</div>
+            {% endif %}
          </form>
          <hr>
          <br>
         <form action="/tts" method="POST" id="ttsForm">
             <label for="tts">Text-to-Speech abspielen</label>
-            <input id="tts" name="tts"/>
+            <input id="tts" name="tts" required/>
             <button type="submit">Abspielen</button>
          </form>
          <hr>
@@ -68,14 +72,14 @@
          <br>
          <form action="/upload" method="POST" enctype="multipart/form-data" onsubmit="return validateFile()">
             <h2>Audiodatei hochladen</h2>
-            <h4>(Unterst&uuml;tze Formate: *.mp3, *.wav, *.m4a, *.aac)</h4>
+            <h4>(Unterst&uuml;tze Formate: MP3, WAV, M4A, AAC)</h4>
             <input type="file" name="file" id="fileInput">
             <button type="submit">Hochladen</button>
          </form>
          <div id="fileUploadAlert" style="display: none;color:Tomato;">Nur die folgenden Dateiformate werden unterstützt: .mp3, *.wav, *.m4a, *.aac</div>
       </main>
       <footer>
-         <p>Hoffest Funkzentrale by <a href="https://prjx.de">https://prjx.de</p>
+         <p>Hoffest Funkzentrale - <a href="https://github.com/cascha42/funkzentrale">GitHub</p>
       </footer>
       <script>
          const deleteLinks = document.querySelectorAll('.delete-link');

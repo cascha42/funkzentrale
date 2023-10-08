@@ -1,0 +1,12 @@
+[Unit]
+Description=Flask app for playing audio files via the audio output. A GPIO can be used to control the push-to-talk button on a radio device.
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/home/pi/audioplayer
+ExecStart=/usr/bin/python3 app.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

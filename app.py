@@ -7,10 +7,13 @@ from gtts import gTTS
 
 app = Flask(__name__)
 
-# GPIO PTT
+# Webserver Port (HTTP)
+http_port = 8080
+
+# Push-to-Talk GPIO (BCM / Broadcom notation, https://pinout.xyz/)
 gpio_pin = 17
 
-# Audio-Files Folder
+# Audio-Files Sub-Folder
 audio_folder = 'audio_files'
 
 # GPIO INIT
@@ -97,5 +100,4 @@ def service_worker():
     return send_from_directory('static', 'service-worker.js', mimetype='application/javascript')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080, debug=True)
-
+    app.run(host='0.0.0.0', port=http_port, debug=True)

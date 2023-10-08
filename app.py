@@ -10,8 +10,12 @@ app = Flask(__name__)
 # Webserver Port (HTTP)
 http_port = 8080
 
-# App-Name
+# App-Name (HTML)
 app_name = "Hoffest Funkzentrale"
+
+# App-Name (PWA / Progressive Web App)
+app_pwa_name = "Hoffest Funkzentrale"
+app_pwa_short_name = "Hoffest"
 
 # App-Logo in '/static' Sub-Folder
 app_logo = "hoffest-logo.png"
@@ -100,6 +104,10 @@ def serve_audio(filename):
 def file_browser():
     audio_files = [f for f in os.listdir(audio_folder)]
     return render_template('file_browser.html.j2', audio_files=audio_files)
+
+@app.route('/manifest.json')
+def manifest():
+    return render_template('manifest.json.j2', app_pwa_name=app_pwa_name, app_pwa_short_name=app_pwa_short_name)
 
 @app.route('/service-worker.js')
 def service_worker():

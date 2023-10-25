@@ -11,14 +11,14 @@ app = Flask(__name__)
 http_port = 8080
 
 # App-Name (HTML)
-app_name = "Hoffest Funkzentrale"
+app_name = "DMR-Funkzentrale"
 
 # App-Name (PWA / Progressive Web App)
-app_pwa_name = "Hoffest Funkzentrale"
-app_pwa_short_name = "Hoffest"
+app_pwa_name = "DMR-Funkzentrale"
+app_pwa_short_name = "DMR Funk"
 
 # App-Logo in '/static' Sub-Folder
-app_logo = "hoffest-logo.png"
+app_logo = "logo.png"
 
 # Push-to-Talk GPIO (BCM / Broadcom notation, https://pinout.xyz/)
 gpio_pin = 17

@@ -9,14 +9,14 @@ from gtts import gTTS
 app = Flask(__name__)
 
 # Webserver Port (HTTP)
-http_port = 8080
+http_port = 8000
 
 # App-Name (HTML)
-app_name = "DMR-Funkzentrale"
+app_name = "37C3 Funkzentrale"
 
 # App-Name (PWA / Progressive Web App)
-app_pwa_name = "DMR-Funkzentrale"
-app_pwa_short_name = "DMR Funk"
+app_pwa_name = "37C3 DMR-Funkzentrale"
+app_pwa_short_name = "37C3 Funk"
 
 # App-Logo in '/static' Sub-Folder
 app_logo = "logo.png"
@@ -50,7 +50,7 @@ def play_audio():
     
     GPIO.output(gpio_pin, GPIO.HIGH)
     
-    time.sleep(0.2)
+    time.sleep(1.0)
     subprocess.run(['mplayer', '-ao', 'alsa', os.path.join(audio_folder, selected_audio)])
     
     GPIO.output(gpio_pin, GPIO.LOW)
@@ -68,7 +68,7 @@ def play_tts():
 
     GPIO.output(gpio_pin, GPIO.HIGH)
 
-    time.sleep(0.2)
+    time.sleep(1.0)
     subprocess.run(['mplayer', '-ao', 'alsa', os.path.join(audio_folder, 'tts.mp3')])
 
     os.remove(os.path.join(audio_folder, 'tts.mp3'))

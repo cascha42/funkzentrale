@@ -39,6 +39,11 @@ def index():
     tts_langs = gtts.lang.tts_langs()
     return render_template('index.html.j2', audio_files=audio_files, tts_langs=tts_langs, app_name=app_name, app_logo=app_logo)
 
+@app.route('/cancel', methods=['POST'])
+def cancel_playback():
+    subprocess.run(['killall', '-9', 'mplayer'])
+    return redirect("/")
+
 @app.route('/play', methods=['POST'])
 def play_audio():
     selected_audio = request.form['audio']

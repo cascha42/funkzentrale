@@ -28,7 +28,8 @@
       </header>
       <main>
          <form action="/play" method="POST" id="playForm">
-            <label for="audio">Audiodatei abspielen</label>
+         <h2>Audiodatei abspielen</h2>
+            <label for="audio"></label>
             <select name="audio" id="audio">
                {% for file in audio_files %}
                <option value="{{ file }}">{{ file.split('.')[0] }}</option>
@@ -42,9 +43,16 @@
          </form>
          <hr>
          <br>
+
         <form action="/tts" method="POST" id="ttsForm">
-            <label for="tts">Text-to-Speech abspielen</label>
+            <h2>Text-to-Speech abspielen</h2>
             <input id="tts" name="tts" required/>
+            <label for="lang">Sprache</label>
+            <select name="lang">
+                {% for lang in tts_langs %}
+                    <option value="{{ lang }}">{{ tts_langs[lang] }}</option>
+                {% endfor %}
+            </select>
             <button type="submit">Abspielen</button>
          </form>
          <hr>

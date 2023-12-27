@@ -1,3 +1,4 @@
+import gtts.lang
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory, make_response
 import os
 import subprocess
@@ -35,7 +36,8 @@ GPIO.output(gpio_pin, GPIO.LOW)
 @app.route('/')
 def index():
     audio_files = [f for f in os.listdir(audio_folder) if f.endswith(('.mp3', '.wav', 'm4a', 'aac'))]
-    return render_template('index.html.j2', audio_files=audio_files, app_name=app_name, app_logo=app_logo)
+    tts_langs = gtts.lang.tts_langs()
+    return render_template('index.html.j2', audio_files=audio_files, tts_langs=tts_langs, app_name=app_name, app_logo=app_logo)
 
 @app.route('/play', methods=['POST'])
 def play_audio():
@@ -54,8 +56,9 @@ def play_audio():
 @app.route('/tts', methods=['POST'])
 def play_tts():
     tts_text = request.form['tts']
+    tts_lang = request.form['lang']
 
-    tts = gTTS(tts_text, lang='de')
+    tts = gTTS(tts_text, tts_lang)
     tts.save(os.path.join(audio_folder, 'tts.mp3'))
 
     GPIO.output(gpio_pin, GPIO.HIGH)

@@ -73,7 +73,7 @@ def play_tts():
 @app.route('/time', methods=['POST'])
 def time_announce():
     tz = zoneinfo.ZoneInfo("Europe/Berlin")
-    tts_text = f"Es ist {datetime.now(tz).strftime('%H:%M:%S')}!"
+    tts_text = f"Es folgt eine Servicemeldung: Es ist nun {datetime.now(tz).strftime('%H:%M')} und {datetime.now(tz).strftime('%S')} Sekunden!"
 
     say(tts_text, 'de')
 

@@ -1,3 +1,5 @@
+import zoneinfo
+
 import gtts.lang
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory, make_response
 import os
@@ -5,6 +7,7 @@ import subprocess
 import RPi.GPIO as GPIO
 import time
 from gtts import gTTS
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -62,20 +65,20 @@ def play_audio():
 def play_tts():
     tts_text = request.form['tts']
     tts_lang = request.form['lang']
-
-    tts = gTTS(tts_text, tts_lang)
-    tts.save(os.path.join(audio_folder, 'tts.mp3'))
-
-    GPIO.output(gpio_pin, GPIO.HIGH)
-
-    time.sleep(1.0)
-    subprocess.run(['mplayer', '-ao', 'alsa', os.path.join(audio_folder, 'tts.mp3')])
-
-    os.remove(os.path.join(audio_folder, 'tts.mp3'))
-
-    GPIO.output(gpio_pin, GPIO.LOW)
+    print(tts_lang)
+    say(tts_text, tts_lang)
 
     return redirect('/')
+
+@app.route('/time', methods=['POST'])
+def time_announce():
+    tz = zoneinfo.ZoneInfo("Europe/Berlin")
+    tts_text = f"Es ist {datetime.now(tz).strftime('%H:%M:%S')}!"
+
+    say(tts_text, 'de')
+
+    return redirect("/")
+
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -120,6 +123,19 @@ def manifest():
 @app.route('/service-worker.js')
 def service_worker():
     return send_from_directory('static', 'service-worker.js', mimetype='application/javascript')
+
+def say(tts_text, tts_lang):
+    tts = gTTS(tts_text, lang=tts_lang)
+    tts.save(os.path.join(audio_folder, 'tts.mp3'))
+
+    GPIO.output(gpio_pin, GPIO.HIGH)
+
+    time.sleep(0.2)
+    subprocess.run(['mplayer', '-ao', 'alsa', os.path.join(audio_folder, 'tts.mp3')])
+
+    os.remove(os.path.join(audio_folder, 'tts.mp3'))
+
+    GPIO.output(gpio_pin, GPIO.LOW)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=http_port, debug=True)

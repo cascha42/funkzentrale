@@ -74,6 +74,13 @@ form {
     flex-direction: column;
 }
 
+.form-row {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 1em;
+}
+
 form h2 {
     padding-bottom: 10px;
 }

@@ -50,16 +50,26 @@
         <form action="/tts" method="POST" id="ttsForm">
             <h2>Text-to-Speech abspielen</h2>
             <input id="tts" name="tts" required/>
+            <div class="form-row">
             <label for="lang">Sprache</label>
             <select name="lang">
                 {% for lang in tts_langs %}
                     <option value="{{ lang }}">{{ tts_langs[lang] }}</option>
                 {% endfor %}
             </select>
+            </div>
             <button type="submit">Abspielen</button>
          </form>
          <hr>
          <br>
+
+      <form action="/time" method="POST" id="ttsForm">
+            <h2>Zeitansage abspielen</h2>
+            <button type="submit">Abspielen</button>
+         </form>
+         <hr>
+         <br>
+
          <h2>Vorhandene Audiodatein</h2>
          <ul>
             {% for file in audio_files %}

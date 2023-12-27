@@ -54,7 +54,11 @@
             <label for="lang">Sprache</label>
             <select name="lang">
                 {% for lang in tts_langs %}
-                    <option value="{{ lang }}">{{ tts_langs[lang] }}</option>
+                    {% if lang == "de" %}
+                        <option selected="selected" value="{{ lang }}">{{ tts_langs[lang] }}</option>
+                    {%  else %}
+                        <option value="{{ lang }}">{{ tts_langs[lang] }}</option>
+                    {% endif %}
                 {% endfor %}
             </select>
             </div>

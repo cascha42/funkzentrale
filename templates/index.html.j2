@@ -1,183 +1,195 @@
 <!DOCTYPE html>
 <html lang="de">
-   <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>{{ app_name }}</title>
-      <link rel="shortcut icon" href="{{ url_for('static', filename=app_logo) }}" type="image/x-icon">
-      <link rel="icon" href="{{ url_for('static', filename=app_logo) }}" type="image/x-icon">
-      <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-      <link rel="manifest" href="/manifest.json">
-      <script>
-         if ('serviceWorker' in navigator) {
-             navigator.serviceWorker.register('/service-worker.js')
-                 .then(function(registration) {
-                     console.log('Service Worker registered with scope:', registration.scope);
-                 })
-                 .catch(function(error) {
-                     console.error('Service Worker registration failed:', error);
-                 });
-         }
-      </script>
-   </head>
-   <body>
-      <header style="display: flex; align-items: center;">
-	      <img style="margin-left: 20px;" src="{{ url_for('static', filename=app_logo) }}" alt="Logo" width="56" height="56">
-	 <h1 style="margin-left: 20px">{{ app_name }}</h1>
-         <button id="toggleDarkMode" class="dark-mode-toggle">L/D</button>
-      </header>
-      <main>
-        <form action="/cancel" method="POST">
-            <button type="submit">Wiedergabe abbrechen</button>
-        </form>
-         <form action="/play" method="POST" id="playForm">
-         <h2>Audiodatei abspielen</h2>
-            <label for="audio"></label>
-            <select name="audio" id="audio">
-               {% for file in audio_files %}
-               <option value="{{ file }}">{{ file.split('.')[0] }}</option>
-               {% endfor %}
-            </select>
-	    {% if audio_files %}
-            <button type="submit">Abspielen</button>
-	    {% else %}
-            <div style="color: Tomato;">Keine Audiodateien vorhanden!</div>
-            {% endif %}
-         </form>
-         <hr>
-         <br>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ app_name }}</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename=app_logo) }}" type="image/x-icon">
+    <link rel="icon" href="{{ url_for('static', filename=app_logo) }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="manifest" href="/manifest.json">
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(function (registration) {
+                    console.log('Service Worker registered with scope:', registration.scope);
+                })
+                .catch(function (error) {
+                    console.error('Service Worker registration failed:', error);
+                });
+        }
+    </script>
+</head>
+<body>
+<header style="display: flex; align-items: center;">
+    <img style="margin-left: 20px;" src="{{ url_for('static', filename=app_logo) }}" alt="Logo" width="56" height="56">
+    <h1 style="margin-left: 20px">{{ app_name }}</h1>
+    <button id="toggleDarkMode" class="dark-mode-toggle">L/D</button>
+</header>
+<main>
+    <form action="/cancel" method="POST">
+        <button type="submit">Wiedergabe abbrechen</button>
+    </form>
+    <hr>
+    <br>
 
-        <form action="/tts" method="POST" id="ttsForm">
-            <h2>Text-to-Speech abspielen</h2>
-            <input id="tts" name="tts" required/>
-            <div class="form-row">
+    {% macro render_item(item) %}
+        <li>
+            {% if item['type'] == 'folder' and item['children'] %}
+                <span class="caret">{{ item['name'] }}</span>
+                <ul class="nested">
+                    {% for child in item['children'] %}
+                        {{ render_item(child) }}
+                    {% endfor %}
+                </ul>
+            {% elif item['type'] == 'file' %}
+                <div class="file-row">
+                    {{ item['name'].split(".") | first }}
+                    <audio controls>
+                        <source src="{{ url_for('serve_audio', filename=item['full_path']) }}" type="audio/mpeg">
+                        Dein Browser unterstützt das Audio-Element nicht.
+                    </audio>
+                    <a href="#" class="preview-link" data-filename="{{ item['full_path'] }}"
+                       onclick="previewAudio('{{ item['full_path'] }}')">Abspielen</a>
+                    <a href="#" class="rename-link" data-filename="{{ item['full_path'] }}">Umbenennen</a>
+                    <a href="#" class="delete-link" data-filename="{{ item['full_path'] }}">Löschen</a>
+                </div>
+            {% endif %}
+        </li>
+    {% endmacro %}
+
+    <ul>
+        <h2>Audiodatei abspielen</h2>
+        {% for item in audio_files['children'] %}
+            {{ render_item(item) }}
+        {% endfor %}
+    </ul>
+    <hr>
+    <br>
+
+    <form action="/time" method="POST" id="ttsForm">
+        <h2>Zeitansage abspielen</h2>
+        <button type="submit">Abspielen</button>
+    </form>
+    <hr>
+    <br>
+
+    <form action="/tts" method="POST" id="ttsForm">
+        <h2>Text-to-Speech abspielen</h2>
+        <input id="tts" name="tts" required/>
+        <div class="form-row">
             <label for="lang">Sprache</label>
             <select name="lang">
                 {% for lang in tts_langs %}
                     {% if lang == "de" %}
                         <option selected="selected" value="{{ lang }}">{{ tts_langs[lang] }}</option>
-                    {%  else %}
+                    {% else %}
                         <option value="{{ lang }}">{{ tts_langs[lang] }}</option>
                     {% endif %}
                 {% endfor %}
             </select>
-            </div>
-            <button type="submit">Abspielen</button>
-         </form>
-         <hr>
-         <br>
+        </div>
+        <button type="submit">Abspielen</button>
+    </form>
+    <hr>
+    <br>
+    <form action="/upload" method="POST" enctype="multipart/form-data" onsubmit="return validateFile()">
+        <h2>Audiodatei hochladen</h2>
+        <h4>(Unterst&uuml;tze Formate: MP3, WAV, M4A, AAC)</h4>
+        <input type="file" name="file" id="fileInput">
+        <button type="submit">Hochladen</button>
+    </form>
+    <div id="fileUploadAlert" style="display: none;color:Tomato;">Nur die folgenden Dateiformate werden unterstützt:
+        .mp3, *.wav, *.m4a, *.aac
+    </div>
+</main>
+<footer>
+    <p>{{ app_name }} - <a href="https://github.com/cascha42/funkzentrale">GitHub</p>
+</footer>
+<script>
+    const deleteLinks = document.querySelectorAll('.delete-link');
+    const renameLinks = document.querySelectorAll('.rename-link');
+    const previewLinks = document.querySelectorAll('.preview-link');
+    const audioFiles = document.querySelectorAll('.audio-file');
 
-      <form action="/time" method="POST" id="ttsForm">
-            <h2>Zeitansage abspielen</h2>
-            <button type="submit">Abspielen</button>
-         </form>
-         <hr>
-         <br>
+    deleteLinks.forEach(link => {
+        link.addEventListener('click', function (e) {
+            e.preventDefault();
+            const filename = this.getAttribute('data-filename');
+            const confirmDelete = confirm(`Möchtest du die Datei "${filename}" wirklich löschen?`);
+            if (confirmDelete) {
+                window.location.href = `/delete/${encodeURIComponent(filename)}`;
+            }
+        });
+    });
 
-         <h2>Vorhandene Audiodatein</h2>
-         <ul>
-            {% for file in audio_files %}
-            <li>
-               {{ file.split('.')[0] }}
-               <br>
-               <audio controls>
-                  <source src="{{ url_for('serve_audio', filename=file) }}" type="audio/mpeg">
-                  Dein Browser unterstützt das Audio-Element nicht.
-               </audio>
-               <br>
-               <a href="#" class="preview-link" data-filename="{{ file }}" onclick="previewAudio('{{ file }}')">Abspielen</a>
-               <a href="#" class="rename-link" data-filename="{{ file }}">Umbenennen</a>
-               <a href="#" class="delete-link" data-filename="{{ file }}">Löschen</a>
-            </li>
-            <br>
-            {% endfor %}
-            <br>
-         </ul>
-         <hr>
-         <br>
-         <form action="/upload" method="POST" enctype="multipart/form-data" onsubmit="return validateFile()">
-            <h2>Audiodatei hochladen</h2>
-            <h4>(Unterst&uuml;tze Formate: MP3, WAV, M4A, AAC)</h4>
-            <input type="file" name="file" id="fileInput">
-            <button type="submit">Hochladen</button>
-         </form>
-         <div id="fileUploadAlert" style="display: none;color:Tomato;">Nur die folgenden Dateiformate werden unterstützt: .mp3, *.wav, *.m4a, *.aac</div>
-      </main>
-      <footer>
-	      <p>{{ app_name}} - <a href="https://github.com/cascha42/funkzentrale">GitHub</p>
-      </footer>
-      <script>
-         const deleteLinks = document.querySelectorAll('.delete-link');
-         const renameLinks = document.querySelectorAll('.rename-link');
-         const previewLinks = document.querySelectorAll('.preview-link');
-         const audioFiles = document.querySelectorAll('.audio-file');
-         
-         deleteLinks.forEach(link => {
-             link.addEventListener('click', function (e) {
-                 e.preventDefault();
-                 const filename = this.getAttribute('data-filename');
-                 const confirmDelete = confirm(`Möchtest du die Datei "${filename}" wirklich löschen?`);
-                 if (confirmDelete) {
-                     window.location.href = `/delete/${filename}`;
-                 }
-             });
-         });
-         
-         renameLinks.forEach(link => {
-             link.addEventListener('click', function (e) {
-                 e.preventDefault();
-                 const filename = this.getAttribute('data-filename');
-                 const newName = prompt('Neuen Dateinamen eingeben:', filename.split('.')[0]);
-                 if (newName) {
-                     const newFilename = newName + '.' + filename.split('.')[1];
-                     window.location.href = `/rename/${filename}/${newFilename}`;
-                 }
-             });
-         });
-         
-         const toggleDarkModeButton = document.getElementById('toggleDarkMode');
-         const body = document.body;
-         
-         function setDarkMode(isDarkMode) {
-             body.classList.toggle('dark-mode', isDarkMode);
-             localStorage.setItem('darkMode', isDarkMode);
-         }
-         
-         function loadDarkMode() {
-             const isDarkMode = localStorage.getItem('darkMode') === 'true';
-             setDarkMode(isDarkMode);
-         }
-         
-         loadDarkMode();
-         toggleDarkModeButton.addEventListener('click', () => {
-             const isDarkMode = body.classList.contains('dark-mode');
-             setDarkMode(!isDarkMode);
-         });
-         
-         function validateFile() {
-             const fileInput = document.getElementById('fileInput');
-             const allowedExtensions = ["mp3", "wav", "m4a", "aac"];
-             const fileName = fileInput.value.toLowerCase();
-             const fileExtension = fileName.split('.').pop();
-             
-             if (!allowedExtensions.includes(fileExtension)) {
-                 const fileUploadAlert = document.getElementById('fileUploadAlert');
-                 fileUploadAlert.style.display = 'block';
-                 setTimeout(() => {
-                     fileUploadAlert.style.display = 'none';
-                 }, 5000);
-                 return false;
-             }
-             
-             return true;
-         }
-         
-         function previewAudio(filename) {
-             const audioDropdown = document.getElementById('audio');
-             audioDropdown.value = filename;
-             document.getElementById('playForm').submit();
-         }
-      </script>
-   </body>
+    renameLinks.forEach(link => {
+        link.addEventListener('click', function (e) {
+            e.preventDefault();
+            const filename = this.getAttribute('data-filename');
+            const newName = prompt('Neuen Dateinamen eingeben:', filename.split('.')[0]);
+            if (newName) {
+                const newFilename = newName + '.' + filename.split('.')[1];
+                window.location.href = `/rename/${encodeURIComponent(filename)}/${encodeURIComponent(newFilename)}`;
+            }
+        });
+    });
+
+    previewLinks.forEach(link => {
+        link.addEventListener('click', function (e) {
+            e.preventDefault();
+            const filename = this.getAttribute('data-filename');
+            window.location.href = `/play/${encodeURIComponent(filename)}`;
+        });
+    });
+
+    const toggleDarkModeButton = document.getElementById('toggleDarkMode');
+    const body = document.body;
+
+    function setDarkMode(isDarkMode) {
+        body.classList.toggle('dark-mode', isDarkMode);
+        localStorage.setItem('darkMode', isDarkMode);
+    }
+
+    function loadDarkMode() {
+        const isDarkMode = localStorage.getItem('darkMode') === 'true';
+        setDarkMode(isDarkMode);
+    }
+
+    loadDarkMode();
+    toggleDarkModeButton.addEventListener('click', () => {
+        const isDarkMode = body.classList.contains('dark-mode');
+        setDarkMode(!isDarkMode);
+    });
+
+    function validateFile() {
+        const fileInput = document.getElementById('fileInput');
+        const allowedExtensions = ["mp3", "wav", "m4a", "aac"];
+        const fileName = fileInput.value.toLowerCase();
+        const fileExtension = fileName.split('.').pop();
+
+        if (!allowedExtensions.includes(fileExtension)) {
+            const fileUploadAlert = document.getElementById('fileUploadAlert');
+            fileUploadAlert.style.display = 'block';
+            setTimeout(() => {
+                fileUploadAlert.style.display = 'none';
+            }, 5000);
+            return false;
+        }
+
+        return true;
+    }
+
+    const toggler = document.getElementsByClassName("caret");
+    let i;
+
+    for (i = 0; i < toggler.length; i++) {
+        toggler[i].addEventListener("click", function () {
+            this.parentElement.querySelector(".nested").classList.toggle("active");
+            this.classList.toggle("caret-down");
+        });
+    }
+</script>
+</body>
 </html>
 

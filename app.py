@@ -1,3 +1,5 @@
+import pathlib
+import urllib
 import zoneinfo
 
 import gtts.lang
@@ -36,26 +38,31 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setup(gpio_pin, GPIO.OUT)
 GPIO.output(gpio_pin, GPIO.LOW)
 
+
 @app.route('/')
 def index():
-    audio_files = [f for f in os.listdir(audio_folder) if f.endswith(('.mp3', '.wav', 'm4a', 'aac'))]
+    # audio_files = [f for f in os.listdir(audio_folder) if f.endswith(('.mp3', '.wav', 'm4a', 'aac'))]
+    audio_files = generate_tree(audio_folder)
     tts_langs = gtts.lang.tts_langs()
-    return render_template('index.html.j2', audio_files=audio_files, tts_langs=tts_langs, app_name=app_name, app_logo=app_logo)
+    return render_template('index.html.j2', audio_files=audio_files, tts_langs=tts_langs, app_name=app_name,
+                           app_logo=app_logo)
+
 
 @app.route('/cancel', methods=['POST'])
 def cancel_playback():
     subprocess.run(['killall', '-9', 'mplayer'])
     return redirect("/")
 
-@app.route('/play', methods=['POST'])
-def play_audio():
-    selected_audio = request.form['audio']
-    
+
+@app.route('/play/<audio>')
+def play_audio(audio):
+    selected_audio = audio
+
     GPIO.output(gpio_pin, GPIO.HIGH)
-    
+
     time.sleep(1.0)
     subprocess.run(['mplayer', '-ao', 'alsa', os.path.join(audio_folder, selected_audio)])
-    
+
     GPIO.output(gpio_pin, GPIO.LOW)
 
     return redirect('/')
@@ -69,6 +76,7 @@ def play_tts():
     say(tts_text, tts_lang)
 
     return redirect('/')
+
 
 @app.route('/time', methods=['POST'])
 def time_announce():
@@ -90,6 +98,7 @@ def upload_file():
             uploaded_file.save(os.path.join(audio_folder, uploaded_file.filename))
     return redirect('/')
 
+
 @app.route('/delete/<filename>')
 def delete_file(filename):
     file_path = os.path.join(audio_folder, filename)
@@ -97,45 +106,69 @@ def delete_file(filename):
         os.remove(file_path)
     return redirect('/')
 
+
 @app.route('/rename/<old_filename>/<new_filename>')
 def rename_file(old_filename, new_filename):
     old_path = os.path.join(audio_folder, old_filename)
     new_path = os.path.join(audio_folder, new_filename)
-    
+
     if os.path.exists(old_path):
         os.rename(old_path, new_path)
-    
+
     return redirect('/')
 
-@app.route('/audio_files/<filename>')
+
+@app.route('/audio_files/<path:filename>')
 def serve_audio(filename):
+    print(filename)
     return send_from_directory(audio_folder, filename)
+
 
 @app.route('/files')
 def file_browser():
     audio_files = [f for f in os.listdir(audio_folder)]
     return render_template('file_browser.html.j2', audio_files=audio_files)
 
+
 @app.route('/manifest.json')
 def manifest():
     return render_template('manifest.json.j2', app_pwa_name=app_pwa_name, app_pwa_short_name=app_pwa_short_name)
+
 
 @app.route('/service-worker.js')
 def service_worker():
     return send_from_directory('static', 'service-worker.js', mimetype='application/javascript')
 
+
+# Helper Funcs
 def say(tts_text, tts_lang):
     tts = gTTS(tts_text, lang=tts_lang)
-    tts.save(os.path.join(audio_folder, 'tts.mp3'))
+    tts.save(os.path.join('/tmp', 'tts.mp3'))
 
     GPIO.output(gpio_pin, GPIO.HIGH)
 
     time.sleep(0.2)
-    subprocess.run(['mplayer', '-ao', 'alsa', os.path.join(audio_folder, 'tts.mp3')])
+    subprocess.run(['mplayer', '-ao', 'alsa', os.path.join('/tmp', 'tts.mp3')])
 
-    os.remove(os.path.join(audio_folder, 'tts.mp3'))
+    os.remove(os.path.join('/tmp', 'tts.mp3'))
 
     GPIO.output(gpio_pin, GPIO.LOW)
+
+
+def generate_tree(root_dir):
+    tree = {'name': os.path.basename(root_dir), 'type': 'folder', 'children': []}
+    try:
+        for entry in os.listdir(root_dir):
+            full_path = os.path.join(root_dir, entry)
+            if os.path.isdir(full_path):
+                tree['children'].append(generate_tree(full_path))
+            else:
+                corrected_path = pathlib.Path(*pathlib.Path(full_path).parts[1:])
+                tree['children'].append({'name': entry, 'type': 'file', 'full_path': corrected_path})
+    except OSError:
+        pass
+    return tree
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=http_port, debug=True)

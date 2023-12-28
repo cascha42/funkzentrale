@@ -78,7 +78,15 @@ form {
     display: flex;
     flex-direction: row;
     align-items: baseline;
-    gap: 1em;
+    gap: 0.5em;
+}
+
+.file-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.25em;
+    /*margin-left: 2em;*/
 }
 
 form h2 {
@@ -108,6 +116,41 @@ footer {
     background-color: #333;
     color: #fff;
     padding: 10px 0;
+}
+
+/* Remove default bullets */
+ul {
+  list-style-type: none;
+}
+
+/* Style the caret/arrow */
+.caret {
+  cursor: pointer;
+  user-select: none; /* Prevent text selection */
+}
+
+/* Create the caret/arrow with a unicode, and style it */
+.caret::before {
+  content: "\25B6";
+  color: black;
+  display: inline-block;
+  margin-right: 6px;
+}
+
+/* Rotate the caret/arrow icon when clicked on (using JavaScript) */
+.caret-down::before {
+  transform: rotate(90deg);
+}
+
+/* Hide the nested list */
+.nested {
+  display: none;
+}
+
+/* Show the nested list when the user clicks on the caret/arrow (with JavaScript) */
+.active {
+  display: block;
+    margin-left: 2em;
 }
 
 /* Mobile Responsive Styles */
@@ -247,6 +290,7 @@ footer {
     background-color: #333; /* Hintergrundfarbe */
     transition: background-color 0.3s ease, border-color 0.3s ease;
 }
+
 .dark-mode-toggle:hover {
     background-color: #555; /* Hintergrundfarbe bei Hover */
     border-color: #555; /* Umrandungsfarbe bei Hover */

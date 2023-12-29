@@ -139,7 +139,7 @@
         link.addEventListener('click', function (e) {
             e.preventDefault();
             const filename = this.getAttribute('data-filename');
-            window.location.href = `/play/${encodeURIComponent(filename)}`;
+            window.location.href = `/play/filename`;
         });
     });
 

@@ -54,9 +54,9 @@ def cancel_playback():
     return redirect("/")
 
 
-@app.route('/play/<audio>')
-def play_audio(audio):
-    selected_audio = audio
+@app.route('/play/<path:filename>')
+def play_audio(filename):
+    selected_audio = filename
 
     GPIO.output(gpio_pin, GPIO.HIGH)
 

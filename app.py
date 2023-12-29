@@ -1,6 +1,7 @@
 import pathlib
 import urllib
 import zoneinfo
+from pprint import pprint
 
 import gtts.lang
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory, make_response
@@ -57,11 +58,14 @@ def cancel_playback():
 @app.route('/play/<path:filename>')
 def play_audio(filename):
     selected_audio = filename
+    print(selected_audio)
+    print(os.path.join(audio_folder, selected_audio))
 
     GPIO.output(gpio_pin, GPIO.HIGH)
 
     time.sleep(1.0)
-    subprocess.run(['mplayer', '-ao', 'alsa', os.path.join(audio_folder, selected_audio)])
+    subprocess.run(['open', os.path.join(audio_folder, selected_audio)])
+    #subprocess.run(['mplayer', '-ao', 'alsa', os.path.join(audio_folder, selected_audio)])
 
     GPIO.output(gpio_pin, GPIO.LOW)
 
@@ -156,7 +160,7 @@ def say(tts_text, tts_lang):
 
 
 def generate_tree(root_dir):
-    tree = {'name': os.path.basename(root_dir), 'type': 'folder', 'children': []}
+    tree = {'name': os.path.basename(root_dir), 'type': '0folder', 'children': []}
     try:
         for entry in os.listdir(root_dir):
             full_path = os.path.join(root_dir, entry)
@@ -164,9 +168,11 @@ def generate_tree(root_dir):
                 tree['children'].append(generate_tree(full_path))
             else:
                 corrected_path = pathlib.Path(*pathlib.Path(full_path).parts[1:])
-                tree['children'].append({'name': entry, 'type': 'file', 'full_path': corrected_path})
+                tree['children'].append({'name': entry, 'type': '1file', 'full_path': corrected_path})
     except OSError:
         pass
+    tree['children'] = sorted(tree['children'], key=lambda x: (x['type'], x['name']))
+
     return tree
 
 

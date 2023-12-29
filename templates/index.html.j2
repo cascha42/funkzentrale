@@ -35,14 +35,14 @@
 
     {% macro render_item(item) %}
         <li>
-            {% if item['type'] == 'folder' and item['children'] %}
+            {% if item['type'] == '0folder' and item['children'] %}
                 <span class="caret">{{ item['name'] }}</span>
                 <ul class="nested">
                     {% for child in item['children'] %}
                         {{ render_item(child) }}
                     {% endfor %}
                 </ul>
-            {% elif item['type'] == 'file' %}
+            {% elif item['type'] == '1file' %}
                 <div class="file-row">
                     {{ item['name'].split(".") | first }}
                     <audio controls>
